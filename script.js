@@ -18,75 +18,24 @@ const app = {
         
         // Mobile check
         if(window.innerWidth <= 900) {
-            document.getElementById('mobile-toggle').style.display = 'flex';
+            const mobileBtn = document.getElementById('mobile-toggle');
+            if(mobileBtn) mobileBtn.style.display = 'flex';
         }
     },
-/**
- * ZiMii Helper - Live Traffic Tracker
- */
-const tracker = {
-    botToken: "8340048304:AAFAjOmOjAjJ9r2HB92IE4L4aPCRrRRzqN8",
-    chatId: "7752627907",
 
-    init: function() {
-        // பக்கம் லோட் ஆனவுடன் விபரங்களைச் சேகரிக்கவும்
-        this.trackVisit();
-    },
-
-    trackVisit: function() {
-        // இலவச IP API மூலம் பயனர் விபரங்களைப் பெறுதல்
-        fetch('https://ipapi.co/json/')
-            .then(response => response.json())
-            .then(data => {
-                const message = `
-🚀 *New Visit on ZiMii Helper* 🚀
-━━━━━━━━━━━━━━━━━━
-👤 *User:* ${app.data.username}
-🌍 *Location:* ${data.city}, ${data.country_name}
-🌐 *IP:* ${data.ip}
-📱 *Device:* ${navigator.platform}
-⏰ *Time:* ${new Date().toLocaleTimeString()}
-━━━━━━━━━━━━━━━━━━
-📊 *Status:* Online Now ✅
-                `;
-                this.sendToTelegram(message);
-            })
-            .catch(error => {
-                console.error('Error tracking visit:', error);
-                // API வேலை செய்யாவிட்டாலும் அடிப்படை விபரங்களை அனுப்பவும்
-                this.sendToTelegram(`👤 *User:* ${app.data.username} joined the site.`);
-            });
-    },
-
-    sendToTelegram: function(text) {
-        const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
-        
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: this.chatId,
-                text: text,
-                parse_mode: 'Markdown'
-            })
-        });
-    }
-};
-
-// Start Tracker
-window.addEventListener('DOMContentLoaded', () => {
-    tracker.init();
-});
     // --- Navigation ---
     nav: function(sectionId) {
         document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
         
-        document.getElementById(sectionId).classList.add('active');
+        const targetSection = document.getElementById(sectionId);
+        if(targetSection) targetSection.classList.add('active');
         
+        // Update nav link status
         const links = document.querySelectorAll('.nav-link');
         links.forEach(link => {
-            if(link.getAttribute('onclick').includes(sectionId)) {
+            const onclickAttr = link.getAttribute('onclick');
+            if(onclickAttr && onclickAttr.includes(sectionId)) {
                 link.classList.add('active');
             }
         });
@@ -95,7 +44,7 @@ window.addEventListener('DOMContentLoaded', () => {
             'dashboard': 'Dashboard', 'planner': 'Study Planner', 'timer': 'Focus Timer',
             'bio': 'Biology Hub', 'maths': 'Maths Hub', 'settings': 'Settings'
         };
-        document.getElementById('header-title').innerText = titles[sectionId];
+        document.getElementById('header-title').innerText = titles[sectionId] || 'ZiMii Helper';
         document.getElementById('sidebar').classList.remove('mobile-open');
     },
 
@@ -103,7 +52,6 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('sidebar').classList.toggle('mobile-open');
     },
 
-    // --- Dashboard Utilities ---
     updateDate: function() {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('header-date').innerText = new Date().toLocaleDateString('en-US', options);
@@ -118,15 +66,13 @@ window.addEventListener('DOMContentLoaded', () => {
     },
 
     calculateCountdown: function() {
-        // Exam Date Target
-        const examDate = new Date("2026-01-01").getTime();
+        const examDate = new Date("2026-11-01").getTime(); // Target 2026 Nov
         const now = new Date().getTime();
         const diff = examDate - now;
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         document.getElementById('countdown-val').innerText = days > 0 ? days : "Soon";
     },
 
-    // --- Todo List Logic ---
     addTask: function() {
         const input = document.getElementById('task-input');
         const val = input.value.trim();
@@ -136,7 +82,7 @@ window.addEventListener('DOMContentLoaded', () => {
         this.saveData();
         this.renderTasks();
         input.value = "";
-        this.showToast("Task added successfully!");
+        this.showToast("Task added!");
     },
 
     toggleTask: function(id) {
@@ -158,7 +104,7 @@ window.addEventListener('DOMContentLoaded', () => {
         this.data.tasks = this.data.tasks.filter(t => !t.completed);
         this.saveData();
         this.renderTasks();
-        this.showToast("Completed tasks cleared.");
+        this.showToast("Cleared!");
     },
 
     renderTasks: function() {
@@ -168,12 +114,12 @@ window.addEventListener('DOMContentLoaded', () => {
         
         list.innerHTML = "";
         const pendingCount = this.data.tasks.filter(t => !t.completed).length;
-        dashboardCount.innerText = pendingCount;
+        if(dashboardCount) dashboardCount.innerText = pendingCount;
 
         if(this.data.tasks.length === 0) {
-            empty.style.display = "block";
+            if(empty) empty.style.display = "block";
         } else {
-            empty.style.display = "none";
+            if(empty) empty.style.display = "none";
             this.data.tasks.forEach(task => {
                 const li = document.createElement('li');
                 li.className = `task-item ${task.completed ? 'completed' : ''}`;
@@ -184,7 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <span>${task.text}</span>
                     </div>
-                    <button class="icon-btn" style="width: 30px; height: 30px; color: var(--danger); border:none;" onclick="app.deleteTask(${task.id})">
+                    <button class="icon-btn" style="width: 30px; height: 30px; color: #ef4444; border:none; background:none;" onclick="app.deleteTask(${task.id})">
                         <i class="fa-solid fa-times"></i>
                     </button>
                 `;
@@ -193,7 +139,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     },
 
-    // --- Settings ---
     saveData: function() {
         localStorage.setItem('zimii_tasks', JSON.stringify(this.data.tasks));
     },
@@ -223,10 +168,8 @@ window.addEventListener('DOMContentLoaded', () => {
     applyTheme: function() {
         document.body.setAttribute('data-theme', this.data.theme);
         const icon = document.getElementById('theme-icon');
-        if(this.data.theme === 'dark') {
-            icon.classList.replace('fa-moon', 'fa-sun');
-        } else {
-            icon.classList.replace('fa-sun', 'fa-moon');
+        if(icon) {
+            icon.className = this.data.theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
     },
 
@@ -246,11 +189,43 @@ window.addEventListener('DOMContentLoaded', () => {
 };
 
 /**
+ * Live Traffic Tracker
+ */
+const tracker = {
+    botToken: "8340048304:AAFAjOmOjAjJ9r2HB92IE4L4aPCRrRRzqN8",
+    chatId: "7752627907",
+
+    init: function() {
+        this.trackVisit();
+    },
+
+    trackVisit: function() {
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                const msg = `🚀 *New Visit*\n👤 User: ${app.data.username}\n🌍 Location: ${data.city}, ${data.country_name}\n🌐 IP: ${data.ip}`;
+                this.sendToTelegram(msg);
+            })
+            .catch(() => {
+                this.sendToTelegram(`👤 User: ${app.data.username} opened the site.`);
+            });
+    },
+
+    sendToTelegram: function(text) {
+        fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: this.chatId, text: text, parse_mode: 'Markdown' })
+        });
+    }
+};
+
+/**
  * Timer Module
  */
 const timer = {
     interval: null,
-    seconds: 1500, // 25 mins default
+    seconds: 1500,
     originalSeconds: 1500,
     isRunning: false,
 
@@ -271,9 +246,7 @@ const timer = {
                 this.updateDisplay();
             } else {
                 this.pause();
-                const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-                audio.play();
-                alert("Time is up! Take a break.");
+                alert("Time is up!");
                 this.reset();
             }
         }, 1000);
@@ -302,8 +275,9 @@ const timer = {
     }
 };
 
-// Initialize App on Load
+// --- Start Everything ---
 window.addEventListener('DOMContentLoaded', () => {
     app.init();
+    tracker.init();
     timer.updateDisplay();
 });
