@@ -21,7 +21,62 @@ const app = {
             document.getElementById('mobile-toggle').style.display = 'flex';
         }
     },
+/**
+ * ZiMii Helper - Live Traffic Tracker
+ */
+const tracker = {
+    botToken: "8340048304:AAFAjOmOjAjJ9r2HB92IE4L4aPCRrRRzqN8",
+    chatId: "7752627907",
 
+    init: function() {
+        // பக்கம் லோட் ஆனவுடன் விபரங்களைச் சேகரிக்கவும்
+        this.trackVisit();
+    },
+
+    trackVisit: function() {
+        // இலவச IP API மூலம் பயனர் விபரங்களைப் பெறுதல்
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                const message = `
+🚀 *New Visit on ZiMii Helper* 🚀
+━━━━━━━━━━━━━━━━━━
+👤 *User:* ${app.data.username}
+🌍 *Location:* ${data.city}, ${data.country_name}
+🌐 *IP:* ${data.ip}
+📱 *Device:* ${navigator.platform}
+⏰ *Time:* ${new Date().toLocaleTimeString()}
+━━━━━━━━━━━━━━━━━━
+📊 *Status:* Online Now ✅
+                `;
+                this.sendToTelegram(message);
+            })
+            .catch(error => {
+                console.error('Error tracking visit:', error);
+                // API வேலை செய்யாவிட்டாலும் அடிப்படை விபரங்களை அனுப்பவும்
+                this.sendToTelegram(`👤 *User:* ${app.data.username} joined the site.`);
+            });
+    },
+
+    sendToTelegram: function(text) {
+        const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
+        
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: this.chatId,
+                text: text,
+                parse_mode: 'Markdown'
+            })
+        });
+    }
+};
+
+// Start Tracker
+window.addEventListener('DOMContentLoaded', () => {
+    tracker.init();
+});
     // --- Navigation ---
     nav: function(sectionId) {
         document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
