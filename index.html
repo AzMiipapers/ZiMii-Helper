@@ -7,29 +7,19 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="intro-page" class="intro-overlay">
-    <div class="intro-content">
-        <i class="fa-solid fa-graduation-cap intro-logo"></i>
-        <h1>Welcome to ZiMii Helper</h1>
-        <p>Your Ultimate A/L Success Companion</p>
-        <button onclick="closeIntro()" class="btn-start">Get Started</button>
+        <div class="intro-content">
+            <i class="fa-solid fa-graduation-cap intro-logo"></i>
+            <h1>Welcome to ZiMii Helper</h1>
+            <p>Your Ultimate A/L Success Companion</p>
+            <button onclick="app.closeIntro()" class="btn-start">Get Started</button>
+        </div>
     </div>
-</div>
 
-<div class="music-card">
-    <h4><i class="fa-solid fa-music"></i> Focus Beats</h4>
-    <div class="music-controls">
-        <button onclick="playMusic('lofi')">Lo-Fi</button>
-        <button onclick="playMusic('rain')">Rain</button>
-        <button onclick="stopMusic()">Stop</button>
-    </div>
-    <audio id="focus-audio" loop></audio>
-</div>
     <nav class="sidebar" id="sidebar">
         <div class="brand">
             <i class="fa-solid fa-graduation-cap"></i> ZiMii Helper
@@ -72,7 +62,7 @@
             <div class="user-avatar" id="avatar-initial">S</div>
             <div>
                 <div style="font-weight: 700; font-size: 14px;" id="sidebar-name">Student</div>
-                <div style="font-size: 12px; color: var(--text-muted);">A/L Batch 2026</div>
+                <div id="user-rank" style="font-size: 12px; font-weight: bold; color: #cd7f32;">Beginner 🎓</div>
             </div>
         </div>
     </nav>
@@ -86,7 +76,12 @@
             <div class="top-actions">
                 <button class="icon-btn" onclick="app.toggleMobileMenu()" style="display: none;" id="mobile-toggle"><i class="fa-solid fa-bars"></i></button>
                 <button class="icon-btn" onclick="app.toggleTheme()"><i class="fa-solid fa-moon" id="theme-icon"></i></button>
-                <button class="icon-btn"><i class="fa-solid fa-bell"></i></button>
+                
+                <div class="music-mini-control">
+                    <button class="icon-btn" onclick="music.play('lofi')" title="Play Lo-fi"><i class="fa-solid fa-headphones"></i></button>
+                    <button class="icon-btn" onclick="music.stop()" title="Stop Music"><i class="fa-solid fa-stop"></i></button>
+                </div>
+                <audio id="focus-audio" loop></audio>
             </div>
         </header>
 
@@ -123,8 +118,8 @@
                             <span class="stat-label">Focus Time</span>
                             <i class="fa-solid fa-clock" style="color: var(--success);"></i>
                         </div>
-                        <div class="stat-val">0h 0m</div>
-                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">Today's Session</div>
+                        <div class="stat-val" id="dashboard-focus-time">0m</div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">Total Session</div>
                     </div>
                 </div>
 
@@ -134,8 +129,8 @@
                         <div style="display: flex; gap: 15px; align-items: center;">
                             <div style="background: #dcfce7; padding: 12px; border-radius: 8px; color: #166534;"><i class="fa-solid fa-dna fa-lg"></i></div>
                             <div>
-                                <h4 style="font-weight: 700;">Biology Past Papers</h4>
-                                <p style="font-size: 13px; color: var(--text-muted);">View 2015-2023 Papers</p>
+                                <h4 style="font-weight: 700;">Biology Hub</h4>
+                                <p style="font-size: 13px; color: var(--text-muted);">View Past Papers</p>
                             </div>
                         </div>
                     </div>
@@ -143,7 +138,7 @@
                         <div style="display: flex; gap: 15px; align-items: center;">
                             <div style="background: #fef3c7; padding: 12px; border-radius: 8px; color: #b45309;"><i class="fa-solid fa-calculator fa-lg"></i></div>
                             <div>
-                                <h4 style="font-weight: 700;">Maths Formulae</h4>
+                                <h4 style="font-weight: 700;">Maths Hub</h4>
                                 <p style="font-size: 13px; color: var(--text-muted);">Trig & Integration</p>
                             </div>
                         </div>
@@ -157,18 +152,13 @@
                         <h3 class="card-title">My Study Tasks</h3>
                         <button class="icon-btn" onclick="app.clearCompleted()"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
-                    
                     <div class="todo-input-wrapper">
-                        <input type="text" id="task-input" class="custom-input" placeholder="What do you need to study today? (e.g., Genetics Unit 2)">
+                        <input type="text" id="task-input" class="custom-input" placeholder="What do you need to study today?">
                         <button class="btn-primary" onclick="app.addTask()">Add Task</button>
                     </div>
-
-                    <ul class="task-list" id="todo-list-container">
-                    </ul>
-                    
-                    <div id="empty-state" style="text-align: center; padding: 40px; color: var(--text-muted); display: none;">
-                        <i class="fa-solid fa-clipboard-check" style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;"></i>
-                        <p>No tasks yet. Start planning your success!</p>
+                    <ul class="task-list" id="todo-list-container"></ul>
+                    <div id="empty-state" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                        <p>No tasks yet.</p>
                     </div>
                 </div>
             </section>
@@ -176,106 +166,51 @@
             <section id="timer" class="section-view">
                 <div class="card" style="text-align: center; max-width: 600px; margin: 0 auto;">
                     <h3 class="card-title" style="margin-bottom: 40px;">Pomodoro Focus</h3>
-                    
                     <div class="timer-circle">
                         <span id="timer-display">25:00</span>
                         <span class="timer-status" id="timer-mode">FOCUS</span>
                     </div>
-
                     <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
                         <button class="btn-primary" onclick="timer.start()" id="start-btn">Start Focus</button>
-                        <button class="icon-btn" onclick="timer.pause()" style="width: auto; padding: 0 20px;">Pause</button>
-                        <button class="icon-btn" onclick="timer.reset()" style="width: auto; padding: 0 20px;">Reset</button>
+                        <button class="icon-btn" onclick="timer.pause()">Pause</button>
+                        <button class="icon-btn" onclick="timer.reset()">Reset</button>
                     </div>
-
                     <div style="display: flex; justify-content: center; gap: 10px;">
-                        <button onclick="timer.setMode(25)" class="icon-btn" style="width: auto; padding: 5px 15px; font-size: 12px;">Pomodoro</button>
-                        <button onclick="timer.setMode(5)" class="icon-btn" style="width: auto; padding: 5px 15px; font-size: 12px;">Short Break</button>
-                        <button onclick="timer.setMode(15)" class="icon-btn" style="width: auto; padding: 5px 15px; font-size: 12px;">Long Break</button>
+                        <button onclick="timer.setMode(25)" class="icon-btn">Pomodoro</button>
+                        <button onclick="timer.setMode(5)" class="icon-btn">Short Break</button>
+                        <button onclick="timer.setMode(15)" class="icon-btn">Long Break</button>
                     </div>
                 </div>
             </section>
 
             <section id="bio" class="section-view">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Biology Resources Repository</h3>
-                    </div>
-                    <table class="resource-table">
-                        <thead>
-                            <tr>
-                                <th>Resource Name</th>
-                                <th>Type</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 8px;"></i> 2023 A/L Biology Paper</td>
-                                <td><span style="background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Official</span></td>
-                                <td><a href="https://www.doenets.lk/exam/downloads" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">Download Now</a></td>
-                            </tr>
-                            <tr>
-                                <td><i class="fa-solid fa-file-pdf" style="color: #ef4444; margin-right: 8px;"></i> Combined Maths 2022</td>
-                                <td><span style="background: #dbeafe; color: #1e40af; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Past Paper</span></td>
-                                <td><a href="https://pastpapers.wiki" target="_blank" style="color: var(--primary); font-weight: 600; text-decoration: none;">Visit Archive</a></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <h3 class="card-title">Biology Past Papers (Tamil Medium)</h3>
+                    <div class="paper-grid" id="bio-papers-list">
+                        </div>
                 </div>
             </section>
             
             <section id="maths" class="section-view">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Combined Maths Hub</h3>
-                    </div>
-                    <div class="grid-3">
-                        <div style="border: 1px solid var(--border); padding: 20px; border-radius: 8px;">
-                            <h4 style="margin-bottom: 15px; color: var(--primary);">Pure Maths</h4>
-                            <ul style="list-style: none; line-height: 2;">
-                                <li><i class="fa-solid fa-angle-right" style="font-size: 12px;"></i> Integration Techniques</li>
-                                <li><i class="fa-solid fa-angle-right" style="font-size: 12px;"></i> Trigonometry Identities</li>
-                            </ul>
-                            <a href="https://pastpapers.wiki/combined-mathematics/" target="_blank" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 10px; margin-top: 15px; font-size: 13px;">View Papers</a>
+                    <h3 class="card-title">Maths Past Papers (Tamil Medium)</h3>
+                    <div class="paper-grid" id="maths-papers-list">
                         </div>
-                         <div style="border: 1px solid var(--border); padding: 20px; border-radius: 8px;">
-                            <h4 style="margin-bottom: 15px; color: var(--warning);">Applied Maths</h4>
-                            <ul style="list-style: none; line-height: 2;">
-                                <li><i class="fa-solid fa-angle-right" style="font-size: 12px;"></i> Projectile Motion</li>
-                                <li><i class="fa-solid fa-angle-right" style="font-size: 12px;"></i> Relative Velocity</li>
-                            </ul>
-                            <button class="btn-primary" style="width: 100%; margin-top: 15px; font-size: 13px; background: var(--warning);">Open Folder</button>
-                        </div>
-                    </div>
                 </div>
             </section>
 
             <section id="settings" class="section-view">
                 <div class="card" style="max-width: 600px;">
-                    <h3 class="card-title" style="margin-bottom: 20px;">App Settings</h3>
-                    
+                    <h3 class="card-title">App Settings</h3>
                     <div style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Your Name</label>
+                        <label>Your Name</label>
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="settings-name" class="custom-input" placeholder="Enter your name">
+                            <input type="text" id="settings-name" class="custom-input">
                             <button class="btn-primary" onclick="app.saveName()">Save</button>
                         </div>
                     </div>
-
-                    <div style="border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="font-size: 15px;">Dark Mode</h4>
-                            <p style="font-size: 12px; color: var(--text-muted);">Easier on the eyes at night.</p>
-                        </div>
-                        <button class="btn-primary" onclick="app.toggleTheme()" style="background: var(--secondary);">Toggle</button>
-                    </div>
-
-                    <div style="border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px;">
-                        <h4 style="font-size: 15px; color: var(--danger);">Danger Zone</h4>
-                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Clear all stored data (Tasks, Name).</p>
-                        <button onclick="app.resetAll()" style="background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Reset Everything</button>
-                    </div>
+                    <button class="btn-primary" onclick="app.toggleTheme()">Toggle Dark Mode</button>
+                    <button onclick="app.resetAll()" style="background: var(--danger); color:white; border:none; padding:10px; border-radius:8px; margin-top:20px;">Reset Everything</button>
                 </div>
             </section>
 
@@ -283,7 +218,7 @@
     </main>
 
     <div id="toast" class="toast">
-        <i class="fa-solid fa-circle-check" style="color: #4ade80;"></i>
+        <i class="fa-solid fa-circle-check"></i>
         <span id="toast-msg">Action Completed!</span>
     </div>
 
