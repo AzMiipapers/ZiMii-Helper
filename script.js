@@ -107,6 +107,58 @@ const app = {
         this.showToast("Cleared!");
     },
 
+    const app = {
+    // ... உங்கள் பழைய கோட் ...
+
+    // 1. Intro Page Close
+    closeIntro: function() {
+        document.getElementById('intro-page').style.display = 'none';
+        this.requestNotificationPermission(); // நோட்டிபிகேஷன் அனுமதி கேட்கும்
+    },
+
+    // 2. Rank Logic based on Focus Time
+    updateRank: function(totalMinutes) {
+        let rank = "Beginner 🎓";
+        let color = "#cd7f32"; // Bronze
+
+        if(totalMinutes > 500) { rank = "Study Warrior ⚔️"; color = "#c0c0c0"; } // Silver
+        if(totalMinutes > 2000) { rank = "A/L Legend 🔥"; color = "#ffd700"; } // Gold
+
+        const rankEl = document.getElementById('user-rank');
+        if(rankEl) {
+            rankEl.innerText = rank;
+            rankEl.style.color = color;
+        }
+    },
+
+    // 3. Background Notifications
+    requestNotificationPermission: function() {
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
+    },
+
+    sendPushNotification: function(title, body) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body: body, icon: 'logo.png' });
+        }
+    }
+};
+
+// 4. Focus Music Logic
+function playMusic(type) {
+    const audio = document.getElementById('focus-audio');
+    const sources = {
+        'lofi': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // உதாரணத்திற்கு
+        'rain': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+    };
+    audio.src = sources[type];
+    audio.play();
+}
+
+function stopMusic() {
+    document.getElementById('focus-audio').pause();
+}
     renderTasks: function() {
         const list = document.getElementById('todo-list-container');
         const empty = document.getElementById('empty-state');
