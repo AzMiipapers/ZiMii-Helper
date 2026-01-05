@@ -12,6 +12,24 @@
 </head>
 <body>
 
+    <div id="intro-page" class="intro-overlay">
+    <div class="intro-content">
+        <i class="fa-solid fa-graduation-cap intro-logo"></i>
+        <h1>Welcome to ZiMii Helper</h1>
+        <p>Your Ultimate A/L Success Companion</p>
+        <button onclick="closeIntro()" class="btn-start">Get Started</button>
+    </div>
+</div>
+
+<div class="music-card">
+    <h4><i class="fa-solid fa-music"></i> Focus Beats</h4>
+    <div class="music-controls">
+        <button onclick="playMusic('lofi')">Lo-Fi</button>
+        <button onclick="playMusic('rain')">Rain</button>
+        <button onclick="stopMusic()">Stop</button>
+    </div>
+    <audio id="focus-audio" loop></audio>
+</div>
     <nav class="sidebar" id="sidebar">
         <div class="brand">
             <i class="fa-solid fa-graduation-cap"></i> ZiMii Helper
