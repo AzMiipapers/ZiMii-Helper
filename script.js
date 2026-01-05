@@ -1,85 +1,254 @@
-// SYYSTEM INITIALIZATION
-document.addEventListener('DOMContentLoaded', () => {
-    // Hide Loader
-    setTimeout(() => {
-        const loader = document.getElementById('loader');
-        loader.style.opacity = '0';
-        setTimeout(() => loader.style.display = 'none', 500);
-    }, 2500);
+/**
+ * ZiMii Helper Core Application Logic
+ */
+const app = {
+    data: {
+        tasks: JSON.parse(localStorage.getItem('zimii_tasks')) || [],
+        username: localStorage.getItem('zimii_name') || 'Student',
+        theme: localStorage.getItem('zimii_theme') || 'light'
+    },
 
-    // Initial Dashboard Setup
-    console.log("ZiMii Helper v4.0.1 Official Connected.");
-    console.log("Contact Trace: 0757457453");
-});
-
-// NAVIGATION ENGINE
-const navItems = document.querySelectorAll('.nav-item');
-const pages = document.querySelectorAll('.content-page');
-const viewTitle = document.getElementById('current-view-title');
-
-navItems.forEach(item => {
-    item.addEventListener('click', () => {
-        const target = item.getAttribute('data-target');
+    init: function() {
+        this.applyTheme();
+        this.updateDate();
+        this.updateGreeting();
+        this.calculateCountdown();
+        this.renderTasks();
+        this.updateUserDisplay();
         
-        // Update Sidebar UI
-        navItems.forEach(nav => nav.classList.remove('active'));
-        item.classList.add('active');
+        // Mobile check
+        if(window.innerWidth <= 900) {
+            document.getElementById('mobile-toggle').style.display = 'flex';
+        }
+    },
 
-        // Update Content UI
-        pages.forEach(page => {
-            page.classList.remove('active');
-            if (page.id === target) {
-                page.classList.add('active');
-                viewTitle.innerText = item.querySelector('span').innerText;
+    // --- Navigation ---
+    nav: function(sectionId) {
+        document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(sectionId).classList.add('active');
+        
+        const links = document.querySelectorAll('.nav-link');
+        links.forEach(link => {
+            if(link.getAttribute('onclick').includes(sectionId)) {
+                link.classList.add('active');
             }
         });
-    });
-});
 
-// THEME ENGINE
-function toggleTheme() {
-    document.body.classList.toggle('dark-mode');
-    const icon = document.querySelector('.theme-toggle i');
-    if (document.body.classList.contains('dark-mode')) {
-        icon.classList.replace('fa-moon', 'fa-sun');
-    } else {
-        icon.classList.replace('fa-sun', 'fa-moon');
+        const titles = {
+            'dashboard': 'Dashboard', 'planner': 'Study Planner', 'timer': 'Focus Timer',
+            'bio': 'Biology Hub', 'maths': 'Maths Hub', 'settings': 'Settings'
+        };
+        document.getElementById('header-title').innerText = titles[sectionId];
+        document.getElementById('sidebar').classList.remove('mobile-open');
+    },
+
+    toggleMobileMenu: function() {
+        document.getElementById('sidebar').classList.toggle('mobile-open');
+    },
+
+    // --- Dashboard Utilities ---
+    updateDate: function() {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('header-date').innerText = new Date().toLocaleDateString('en-US', options);
+    },
+
+    updateGreeting: function() {
+        const hour = new Date().getHours();
+        let greet = "Good Morning";
+        if (hour >= 12 && hour < 17) greet = "Good Afternoon";
+        else if (hour >= 17) greet = "Good Evening";
+        document.getElementById('greeting').innerText = `${greet}, ${this.data.username}!`;
+    },
+
+    calculateCountdown: function() {
+        // Exam Date Target
+        const examDate = new Date("2026-01-01").getTime();
+        const now = new Date().getTime();
+        const diff = examDate - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        document.getElementById('countdown-val').innerText = days > 0 ? days : "Soon";
+    },
+
+    // --- Todo List Logic ---
+    addTask: function() {
+        const input = document.getElementById('task-input');
+        const val = input.value.trim();
+        if(!val) return;
+
+        this.data.tasks.push({ id: Date.now(), text: val, completed: false });
+        this.saveData();
+        this.renderTasks();
+        input.value = "";
+        this.showToast("Task added successfully!");
+    },
+
+    toggleTask: function(id) {
+        const task = this.data.tasks.find(t => t.id === id);
+        if(task) {
+            task.completed = !task.completed;
+            this.saveData();
+            this.renderTasks();
+        }
+    },
+
+    deleteTask: function(id) {
+        this.data.tasks = this.data.tasks.filter(t => t.id !== id);
+        this.saveData();
+        this.renderTasks();
+    },
+
+    clearCompleted: function() {
+        this.data.tasks = this.data.tasks.filter(t => !t.completed);
+        this.saveData();
+        this.renderTasks();
+        this.showToast("Completed tasks cleared.");
+    },
+
+    renderTasks: function() {
+        const list = document.getElementById('todo-list-container');
+        const empty = document.getElementById('empty-state');
+        const dashboardCount = document.getElementById('dashboard-tasks');
+        
+        list.innerHTML = "";
+        const pendingCount = this.data.tasks.filter(t => !t.completed).length;
+        dashboardCount.innerText = pendingCount;
+
+        if(this.data.tasks.length === 0) {
+            empty.style.display = "block";
+        } else {
+            empty.style.display = "none";
+            this.data.tasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item ${task.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="task-content" onclick="app.toggleTask(${task.id})">
+                        <div class="custom-checkbox">
+                            ${task.completed ? '<i class="fa-solid fa-check" style="color:white; font-size: 12px;"></i>' : ''}
+                        </div>
+                        <span>${task.text}</span>
+                    </div>
+                    <button class="icon-btn" style="width: 30px; height: 30px; color: var(--danger); border:none;" onclick="app.deleteTask(${task.id})">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                `;
+                list.appendChild(li);
+            });
+        }
+    },
+
+    // --- Settings ---
+    saveData: function() {
+        localStorage.setItem('zimii_tasks', JSON.stringify(this.data.tasks));
+    },
+
+    saveName: function() {
+        const name = document.getElementById('settings-name').value;
+        if(name) {
+            this.data.username = name;
+            localStorage.setItem('zimii_name', name);
+            this.updateUserDisplay();
+            this.updateGreeting();
+            this.showToast("Name updated!");
+        }
+    },
+
+    updateUserDisplay: function() {
+        document.getElementById('sidebar-name').innerText = this.data.username;
+        document.getElementById('avatar-initial').innerText = this.data.username.charAt(0).toUpperCase();
+    },
+
+    toggleTheme: function() {
+        this.data.theme = this.data.theme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('zimii_theme', this.data.theme);
+        this.applyTheme();
+    },
+
+    applyTheme: function() {
+        document.body.setAttribute('data-theme', this.data.theme);
+        const icon = document.getElementById('theme-icon');
+        if(this.data.theme === 'dark') {
+            icon.classList.replace('fa-moon', 'fa-sun');
+        } else {
+            icon.classList.replace('fa-sun', 'fa-moon');
+        }
+    },
+
+    resetAll: function() {
+        if(confirm("Are you sure? This will delete all tasks and settings.")) {
+            localStorage.clear();
+            location.reload();
+        }
+    },
+
+    showToast: function(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
-}
+};
 
-// MASTER PLANNER LOGIC
-function addTask() {
-    const input = document.getElementById('taskInput');
-    const priority = document.getElementById('taskPriority').value;
-    const list = document.getElementById('taskList');
+/**
+ * Timer Module
+ */
+const timer = {
+    interval: null,
+    seconds: 1500, // 25 mins default
+    originalSeconds: 1500,
+    isRunning: false,
 
-    if (input.value.trim() === "") return;
+    updateDisplay: function() {
+        const m = Math.floor(this.seconds / 60).toString().padStart(2, '0');
+        const s = (this.seconds % 60).toString().padStart(2, '0');
+        document.getElementById('timer-display').innerText = `${m}:${s}`;
+    },
 
-    const li = document.createElement('li');
-    li.className = `task-item p-${priority}`;
-    li.style.cssText = "background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid;";
-    
-    // Priority Colors
-    if(priority === 'high') li.style.borderColor = "#f43f5e";
-    else if(priority === 'med') li.style.borderColor = "#f59e0b";
-    else li.style.borderColor = "#10b981";
+    start: function() {
+        if(this.isRunning) return;
+        this.isRunning = true;
+        document.getElementById('start-btn').innerText = "Running...";
+        
+        this.interval = setInterval(() => {
+            if(this.seconds > 0) {
+                this.seconds--;
+                this.updateDisplay();
+            } else {
+                this.pause();
+                const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+                audio.play();
+                alert("Time is up! Take a break.");
+                this.reset();
+            }
+        }, 1000);
+    },
 
-    li.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span>${input.value} <small>(${priority.toUpperCase()})</small></span>
-            <button onclick="this.parentElement.parentElement.remove()" style="background:none; border:none; color:#f43f5e; cursor:pointer;"><i class="fas fa-trash"></i></button>
-        </div>
-    `;
+    pause: function() {
+        clearInterval(this.interval);
+        this.isRunning = false;
+        document.getElementById('start-btn').innerText = "Resume";
+    },
 
-    list.prepend(li);
-    input.value = "";
-    
-    // Auto Notification
-    new Notification("ZiMii Planner", { body: "New study task added successfully!" });
-}
+    reset: function() {
+        this.pause();
+        this.seconds = this.originalSeconds;
+        this.updateDisplay();
+        document.getElementById('start-btn').innerText = "Start Focus";
+    },
 
-// GLOBAL HELPER
-function switchTab(id) {
-    const targetItem = document.querySelector(`[data-target="${id}"]`);
-    if(targetItem) targetItem.click();
-}
+    setMode: function(mins) {
+        this.pause();
+        this.seconds = mins * 60;
+        this.originalSeconds = mins * 60;
+        this.updateDisplay();
+        const modes = { 25: 'FOCUS', 5: 'SHORT BREAK', 15: 'LONG BREAK' };
+        document.getElementById('timer-mode').innerText = modes[mins];
+    }
+};
+
+// Initialize App on Load
+window.addEventListener('DOMContentLoaded', () => {
+    app.init();
+    timer.updateDisplay();
+});
