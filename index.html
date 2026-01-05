@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZiMii Helper | Official Mega Study Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="official-theme">
+
+    <div id="loader">
+        <div class="loader-box">
+            <div class="logo-text">ZiMii</div>
+            <div class="progress-container"><div class="progress-fill"></div></div>
+            <p>Syncing Academic Database...</p>
+        </div>
+    </div>
+
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon"><i class="fas fa-microchip"></i></div>
+                <div class="logo-name">ZiMii <span>Helper</span></div>
+            </div>
+
+            <nav class="nav-links">
+                <p class="nav-label">Main Dashboard</p>
+                <div class="nav-item active" data-target="dash"><i class="fas fa-house-user"></i> <span>Overview</span></div>
+                <div class="nav-item" data-target="planner"><i class="fas fa-rectangle-list"></i> <span>Master Planner</span></div>
+                
+                <p class="nav-label">Subject Streams</p>
+                <div class="nav-item sub-trigger" data-target="bio"><i class="fas fa-dna"></i> <span>Biology Portal</span></div>
+                <div class="nav-item sub-trigger" data-target="maths"><i class="fas fa-calculator"></i> <span>Maths Portal</span></div>
+                <div class="nav-item" data-target="physics"><i class="fas fa-atom"></i> <span>Physics Hub</span></div>
+                <div class="nav-item" data-target="chemistry"><i class="fas fa-flask-vial"></i> <span>Chemistry Hub</span></div>
+
+                <p class="nav-label">Focus Tools</p>
+                <div class="nav-item" data-target="timer"><i class="fas fa-stopwatch-20"></i> <span>Focus Lab</span></div>
+                <div class="nav-item" data-target="resources"><i class="fas fa-folder-tree"></i> <span>Archive Vault</span></div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="support-pill" onclick="switchTab('contact')">
+                    <i class="fas fa-circle-info"></i> Official Support
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-nav">
+                <div class="nav-left">
+                    <h2 id="current-view-title">Academic Overview</h2>
+                </div>
+                <div class="nav-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search for Tute, MCQ or Unit...">
+                    </div>
+                    <div class="control-icons">
+                        <div class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></div>
+                        <div class="notif-bell"><i class="fas fa-bell"></i><span class="pulse"></span></div>
+                    </div>
+                    <div class="user-chip">
+                        <img src="https://ui-avatars.com/api/?name=AL+Student&background=0062ff&color=fff" alt="User">
+                        <div class="user-details">
+                            <span class="u-name">AL Scholar</span>
+                            <span class="u-status">Online</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="scroll-area">
+                <section id="dash" class="content-page active">
+                    <div class="welcome-banner">
+                        <div class="banner-info">
+                            <h1>Namaste, Future Professional! 👋</h1>
+                            <p>You have <strong>128 days</strong> remaining for the Final AL Examination. Your current syllabus completion is at 64%.</p>
+                            <div class="banner-actions">
+                                <button class="btn-primary">View Full Progress</button>
+                                <button class="btn-secondary">Daily Goal</button>
+                            </div>
+                        </div>
+                        <div class="banner-visual">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3048/3048122.png" alt="Study">
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon b-blue"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info"><h3>48.5h</h3><p>Focus Time</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon b-green"><i class="fas fa-check-double"></i></div>
+                            <div class="stat-info"><h3>12/15</h3><p>Tasks Done</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon b-purple"><i class="fas fa-bolt"></i></div>
+                            <div class="stat-info"><h3>12</h3><p>Day Streak</p></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon b-red"><i class="fas fa-trophy"></i></div>
+                            <div class="stat-info"><h3>A+</h3><p>Estimated</p></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-bottom">
+                        <div class="chart-container">
+                            <h3>Performance Analytics</h3>
+                            <div class="visual-bars">
+                                <div class="bar-item"><div class="bar-fill" style="height: 80%;"></div><span>Bio</span></div>
+                                <div class="bar-item"><div class="bar-fill" style="height: 60%;"></div><span>Chem</span></div>
+                                <div class="bar-item"><div class="bar-fill" style="height: 45%;"></div><span>Phys</span></div>
+                                <div class="bar-item"><div class="bar-fill" style="height: 70%;"></div><span>Math</span></div>
+                            </div>
+                        </div>
+                        <div class="upcoming-tasks">
+                            <h3>Urgent Goals</h3>
+                            <div class="task-mini"><i class="fas fa-circle-dot"></i> Physics Mechanics Revision</div>
+                            <div class="task-mini"><i class="fas fa-circle-dot"></i> Inorganic Chemistry MCQ</div>
+                            <div class="task-mini"><i class="fas fa-circle-dot"></i> Combined Maths Pure Paper</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="bio" class="content-page">
+                    <div class="section-hero bio-hero">
+                        <h2>Biology Excellence Portal</h2>
+                    </div>
+                    <div class="resource-grid">
+                        <div class="resource-card">
+                            <div class="res-type">PDF</div>
+                            <h3>Genetics Master Guide</h3>
+                            <p>Official ZiMii Revision Note</p>
+                            <button class="btn-dl">Download</button>
+                        </div>
+                        </div>
+                </section>
+
+                <section id="planner" class="content-page">
+                    <div class="planner-box">
+                        <div class="planner-header">
+                            <h2>Smart Study Planner</h2>
+                            <p>Organize your AL schedule with priorities</p>
+                        </div>
+                        <div class="planner-input">
+                            <input type="text" id="taskInput" placeholder="Enter task (e.g., Study Organic Chemistry)...">
+                            <select id="taskPriority">
+                                <option value="high">High</option>
+                                <option value="med">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <button onclick="addTask()">Add Task</button>
+                        </div>
+                        <ul id="taskList" class="task-list"></ul>
+                    </div>
+                </section>
+
+                <section id="contact" class="content-page">
+                    <div class="contact-card">
+                        <div class="contact-left">
+                            <h2>Official Support</h2>
+                            <p>Get in touch with ZiMii Helper developers for issues or resource requests.</p>
+                            <div class="info-line"><i class="fas fa-phone"></i> 0757457453</div>
+                            <div class="info-line"><i class="fas fa-envelope"></i> killjilebi@gmail.com</div>
+                            <div class="info-line"><i class="fas fa-map-pin"></i> Official Hub, Sri Lanka</div>
+                        </div>
+                        <div class="contact-right">
+                            <input type="text" placeholder="Your Name">
+                            <input type="email" placeholder="Email Address">
+                            <textarea placeholder="How can we help you?"></textarea>
+                            <button class="btn-submit">Send Official Message</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
